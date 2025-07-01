@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build  # Nota: usa .NET 8 como especificado
+WORKDIR /src
+
+COPY ["Uttt.Micro.Cupon.csproj", "."]
+RUN dotnet restore "Uttt.Micro.Cupon.csproj"
+
+COPY . .
+RUN dotnet publish "Uttt.Micro.Cupon.csproj" -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app .
+
+ENV RUN_MIGRATIONS=1
+
+ENTRYPOINT ["dotnet", "Uttt.Micro.Cupon.dll"]
